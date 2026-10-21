@@ -1,0 +1,316 @@
+check keywords warn
+echo on
+
+!---LUA BEGIN 
+! function TestContact(zb,bed) 
+!   if zb > (bed+0.01) then return -1.0 else return 1.0 end 
+! end 
+! function IfThenElse(condition,t,f) 
+!   if condition then return t else return f end 
+! end 
+!---LUA END 
+
+! -----------------------
+! LUA FUNCTION FOR IN/OUTFLOW BCs
+! NOTE: alpha AND u_b MUST MATCH $alphadeg AND $u_b BELOW
+! NOTE: Pw_factor MUST MATCH $Pw_factor BELOW
+! -----------------------
+!---LUA BEGIN
+! yearinsec = 365.25*24*60*60
+! rhoi    = 917.0/(1.0e6*yearinsec^2)
+! grav    = 9.81*yearinsec^2
+! E       = 9.0e3
+! nu      = 0.3
+! alpha   = math.rad(1.221)   -- MUST MATCH $alphadeg BELOW
+! u_b     = 0.0                -- MUST MATCH $u_b BELOW
+! Pw_factor = 1.0       -- MUST MATCH $Pw_factor BELOW
+!
+! function u_elastic_local(z, H)
+!   return u_b + 2*(1+nu)*rhoi*grav*math.sin(alpha)/E * (H*z - z^2/2)
+! end
+!---LUA END
+
+! ============================
+! Units: MPa - m - a (years)
+! ============================
+$ yearinsec = 365.25*24*60*60
+$ rhoi    = 917.0/(1.0e6*yearinsec^2)   ! MPa·a^2/m^2
+$ gravity = -9.81*yearinsec^2           ! m/a^2  (z is up, so g<0)
+$ selfweight = gravity*rhoi
+
+! Elastic properties for ice
+$ E           = 9.0e3     ! Young's modulus [MPa]
+$ youngmod_str = "9.0e3"
+$ nu          = 0.3       ! Poisson ratio
+
+! -----------------------------
+! Case parameters
+! NOTE: u_b AND alpha MUST MATCH VALUES IN LUA BLOCK ABOVE
+! NOTE: Pw_factor MUST MATCH VALUE IN LUA BLOCK ABOVE
+! -----------------------------
+$ lakenum_cw_str = "2394"
+$ domain_km_str  = "25"
+$ alphadeg_str   = "1.221"
+$ alphadeg       = 1.221
+$ Hp_str         = "746"
+$ u_b            = 0.0        ! basal sliding displacement [m]
+$ Pw_factor      = 1.0 ! water pressure as fraction of overburden
+$ patch_type     = "patch"  ! nopatch | patch | blister
+
+! Parameters for patch/blister
+$ Lx = 24750.0      ! [m]
+$ xc = Lx/2         ! [m] patch center x
+$ yc = Lx/2         ! [m] patch center y
+$ R  = 2500         ! [m] patch/blister radius
+
+$ BCtype = "patch_u0p0"
+
+! Derived paths
+$ bedDEM_path = "../dems/lake" lakenum_cw_str "_bed_d" domain_km_str "km_h" Hp_str "_a" alphadeg_str ".dat"
+$ ZsDEM_path  = "../dems/lake" lakenum_cw_str "_surface_d" domain_km_str "km_h" Hp_str "_a" alphadeg_str ".dat"
+$ ZbDEM_path = "../dems/lake2394_bed_d25km_h746_a1.221.dat"
+$ result_path = "elastic_lake" lakenum_cw_str "_d" domain_km_str "km_r2500m_youngmod" youngmod_str "_bc" BCtype "_nu0.3.result"
+$ vtu_path    = "elastic_lake" lakenum_cw_str "_d" domain_km_str "km_r2500m_youngmod" youngmod_str "_bc" BCtype "_nu0.3.vtu"
+
+Header
+  Mesh DB "." "lake2394_d25km_r2500m"
+End
+
+Constants
+  rhoi = Real $rhoi
+  g    = Real $gravity
+  E    = Real $E
+  nu   = Real $nu
+End
+
+!---------------------------------------------------
+!---------------- SIMULATION -----------------------
+!---------------------------------------------------
+
+Simulation
+  Coordinate System = Cartesian 3D
+  Simulation Type   = Steady
+
+  Extruded Mesh Levels = Integer 20
+
+  Steady State Min Iterations = 1
+  Steady State Max Iterations = 1
+
+  Output File = File $result_path
+  Post File   = File $vtu_path
+  Max Output Level = 3
+End
+
+!---------------------------------------------------
+!---------------- BODIES ---------------------------
+!---------------------------------------------------
+
+Body 1
+  Name       = "elastic_ice"
+  Equation   = 1
+  Body Force = 1
+  Material   = 1
+  Initial Condition = 1
+End
+
+!---------------------------------------------------
+!---------------- INITIAL CONDITIONS ---------------
+!---------------------------------------------------
+
+Initial Condition 1
+  Displacement 1 = Real 0.0
+  Displacement 2 = Real 0.0
+  Displacement 3 = Real 0.0
+End
+
+!---------------------------------------------------
+!---------------- BODY FORCES ----------------------
+!---------------------------------------------------
+
+Body Force 1
+  Stress Bodyforce 1 = Real 0.0
+  Stress Bodyforce 2 = Real 0.0
+  Stress Bodyforce 3 = Real $selfweight
+End
+
+!---------------------------------------------------
+!---------------- MATERIALS ------------------------
+!---------------------------------------------------
+
+Material 1
+  Youngs Modulus = Real $E
+  Poisson Ratio  = Real $nu
+  Density        = Real $rhoi
+End
+
+!---------------------------------------------------
+!---------------- SOLVERS --------------------------
+!---------------------------------------------------
+
+Solver 1
+  Exec Solver = "Before Simulation"
+  Equation = "Read DEMs"
+  Procedure = "ElmerIceSolvers" "Grid2DInterpolator"
+
+  ! Bed
+  Variable 1 = String "bedDEM"
+  Variable 1 data file = File $bedDEM_path
+  Variable 1 x0 = Real 0.0
+  Variable 1 y0 = Real 0.0
+  Variable 1 lx = Real 24750.0
+  Variable 1 ly = Real 24750.0
+  Variable 1 Nx = Integer 166
+  Variable 1 Ny = Integer 166
+  Variable 1 Invert = Logical False
+  Variable 1 Fill = Logical False
+  Variable 1 Position Tol = Real 1.0e-1
+
+  ! Surface
+  Variable 2 = String "ZsDEM"
+  Variable 2 data file = File $ZsDEM_path
+  Variable 2 x0 = Real 0.0
+  Variable 2 y0 = Real 0.0
+  Variable 2 lx = Real 24750.0
+  Variable 2 ly = Real 24750.0
+  Variable 2 Nx = Integer 166
+  Variable 2 Ny = Integer 166
+  Variable 2 Invert = Logical False
+  Variable 2 Fill = Logical False
+  Variable 2 Position Tol = Real 1.0e-1
+
+  ! Zb DEM (blister roof)
+  Variable 3 = String "ZbDEM"
+  Variable 3 data file = File $ZbDEM_path
+  Variable 3 x0 = Real 0.0
+  Variable 3 y0 = Real 0.0
+  Variable 3 lx = Real 24750.0
+  Variable 3 ly = Real 24750.0
+  Variable 3 Nx = Integer 166
+  Variable 3 Ny = Integer 166
+  Variable 3 Invert = Logical False
+  Variable 3 Fill = Logical False
+  Variable 3 Position Tol = Real 1.0e-1
+  Variable 3 No Data = Real -9999.0
+  Variable 3 No Data Tol = Real 1.0
+End
+
+Solver 2
+  Equation = "MapCoordinate"
+  Procedure = "StructuredMeshMapper" "StructuredMeshMapper"
+
+  Active Coordinate = Integer 3
+  Mesh Velocity Variable = String "dSdt"
+  Mesh Update Variable = String "dS"
+  Mesh Velocity First Zero = Logical True
+
+  Displacement Mode = Logical False
+  Correct Surface = Logical True
+  Minimum Height = Real 1.0
+End
+
+Solver 3
+  Equation = "NormalVector"
+  Procedure = "ElmerIceSolvers" "ComputeNormalSolver"
+  Variable = String "Normal Vector"
+  Variable DOFs = 3
+  ComputeAll = Logical False
+  Optimize Bandwidth = Logical False
+End
+
+Solver 4
+  Equation = "Elasticity Analysis"
+  Procedure = "StressSolve" "StressSolver"
+  Variable = String "Displacement"
+  Variable DOFs = Integer 3
+
+  Exported Variable 1 = -dofs 1 "dSdt"
+  Exported Variable 2 = -dofs 1 "dS"
+  Exported Variable 3 = -dofs 1 "BedDEM"
+  Exported Variable 4 = -dofs 1 "ZsDEM"
+  Exported Variable 5 = -dofs 1 "ZbDEM"
+
+  Calculate Stresses = Logical True
+  Calculate Principal = Logical True
+  Displace Mesh = Logical False
+
+  Linear System Solver = Direct
+  Linear System Symmetric = Logical True
+  Linear System Direct Method = MUMPS
+End
+
+!---------------------------------------------------
+!---------------- EQUATIONS ------------------------
+!---------------------------------------------------
+
+Equation 1
+  Active Solvers(4) = 1 2 3 4
+End
+
+!---------------------------------------------------
+!---------------- BOUNDARY CONDITIONS --------------
+!---------------------------------------------------
+
+! =========================
+! LATERAL WALLS (IDs 1-4)
+! =========================
+
+!! "SOUTH" wall (y = 0) -> ID 1
+Boundary Condition 1
+  Target Boundaries = 1
+  Displacement 2 = Real 0.0
+End
+
+!! "EAST" wall (x = Lx) -> ID 2
+Boundary Condition 2
+  Name = "east_outflow"
+  Target Boundaries = 2
+  Displacement 1 = Variable Coordinate 3, bedDEM, ZsDEM
+    Real LUA "u_elastic_local(tx[0] - tx[1], tx[2] - tx[1])"
+End
+
+!! "NORTH" wall (y = Ly) -> ID 3
+Boundary Condition 3
+  Target Boundaries = 3
+  Displacement 2 = Real 0.0
+End
+
+!! "WEST" wall (x = 0) -> ID 4
+Boundary Condition 4
+  Name = "west_inflow"
+  Target Boundaries = 4
+  Displacement 1 = Variable Coordinate 3, bedDEM, ZsDEM
+    Real LUA "u_elastic_local(tx[0] - tx[1], tx[2] - tx[1])"
+End
+
+! =========================
+! BED (BOTTOM SURFACE)
+! =========================
+Boundary Condition 5
+  Bottom Surface = Equals bedDEM
+
+  ComputeNormal = Logical True
+  Normal-Tangential Displacement = Logical True
+
+  ! Normal direction: no penetration outside blister; water pressure inside
+  Displacement 1 = Real 0.0
+  
+  
+
+  ! Tangent1 (~y): prescribed 0 outside patch/blister, free inside
+  Displacement 2 = Real 0.0
+  Displacement 2 Condition = Variable Coordinate 1, Coordinate 2
+    Real MATC "(1 - (((tx[0] - xc)^2 + (tx[1] - yc)^2) < R^2)) * 2 - 1"
+
+  ! Tangent2 (~x, downslope): prescribed u_b outside patch/blister, free inside
+  Displacement 3 = Real $u_b
+  Displacement 3 Condition = Variable Coordinate 1, Coordinate 2
+    Real MATC "(1 - (((tx[0] - xc)^2 + (tx[1] - yc)^2) < R^2)) * 2 - 1"
+
+End
+
+! =========================
+! TOP (UPPER SURFACE)
+! =========================
+Boundary Condition 6
+  Top Surface = Equals ZsDEM
+End
