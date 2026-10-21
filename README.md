@@ -39,9 +39,8 @@ elmer-ice/
 Lake directories use the paper's lake IDs; [MANIFEST.md](MANIFEST.md) maps
 them to the internal IDs in the filenames, lists the calibrated per-lake
 parameters, and records which figure every simulation appears in.
-`figs/` holds figure-generation scripts.
 
-![Center lakes map](figs/center_lakes_map/center_lakes_map_2511gold.png)
+![Center lakes map](assets/center_lakes_map_2511gold.png)
 *The seven center-lake tiles. Gold: lake 2511, used as the featured example
 below.*
 
