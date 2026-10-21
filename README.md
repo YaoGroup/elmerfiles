@@ -26,7 +26,7 @@ zero-to-run commands.
 ## Layout
 
 ```
-elmerice/
+elmer-ice/
 ├── real_topography/
 │   ├── viscous/lakeNNNN/            # Glen free-slip-patch sim per lake: SIF, mesh,
 │   │   │                            #   DEMs (bed/surface/speed), PROG/ user function
@@ -75,7 +75,7 @@ on an ordinary laptop:
 
 ```bash
 git clone https://github.com/YaoGroup/pnas2026-solverfiles.git
-cd pnas2026-solverfiles/elmerice/idealized
+cd pnas2026-solverfiles/elmer-ice/idealized
 docker pull andrewdnolan/elmerice
 
 # 1) convert the gmsh mesh to an Elmer mesh database (creates flatslabnewt_R2500/)
@@ -100,7 +100,7 @@ shipped runs the no-patch (pre-drainage) case; two header variables switch
 it to the post-drainage free-slip-patch case:
 
 ```bash
-cd elmerice/real_topography/viscous/lake2511
+cd elmer-ice/real_topography/viscous/lake2511
 docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
   bash -lc "elmerf90 PROG/USF_TAVz.F90 -o PROG/USF_TAVz && \
             ElmerGrid 14 2 lake2511_d25km_r2500m.msh -autoclean && \
