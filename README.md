@@ -43,7 +43,7 @@ parameters, and records which figure every simulation appears in.
 ![Lake 2394 overview](assets/lake2394_overview.gif)
 *The seven center-lake tiles (gold: lake 2394). Right, cycling: lake 2394's
 tile through pre/post-drainage Sentinel-2 imagery and the simulated viscous
-surface stress $\sigma_{t1}$ pre, post, and drainage-induced change, with the
+surface stress σt1 pre, post, and drainage-induced change, with the
 viscous stress space evolving alongside (gold rings: lake 2394's tile).*
 
 ## The simulations
