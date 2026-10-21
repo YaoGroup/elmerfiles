@@ -32,9 +32,6 @@ elmerice/
 └── idealized/              # idealized-slab simulations from the SI
 ```
 
-(`elmerice/` is the Elmer/Ice group; the 2D viscoelastic SiStER configurations,
-if added later, would live in a sibling directory.)
-
 ## Software versions
 
 - **Elmer/Ice: Elmer v 9.0 (Rev: cf291b69, compiled 2021-11-03)**, with MUMPS
