@@ -1,0 +1,353 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!                                       !!
+!! Elmer/Ice Course 2011                 !!
+!!                                       !!
+!! Olivier Gagliardini  May 2011         !!
+!!                                       !!
+!! Tete Rousse Step 1 - No cavity       !! 
+!!                                       !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Updated April 2013 to use internal Mesh Extrusion
+! Updated Oct 2014 to use the Grid2dInterpolator solver 
+! Updated Oct 2018 to use LUA language instead of MATC  
+
+check keywords warn
+echo on
+
+! Name of output files
+$Step = "patch"
+
+! Define the parameter in MPa - a - m
+#yearinsec = 365.25*24*60*60
+#rhoi = 917.0/(1.0e6*yearinsec^2)   
+#rhow = 1000.0/(1.0e6*yearinsec^2) 
+#gravity = -9.81*yearinsec^2
+
+! Prefactor from Cuffey and Paterson (2010) in MPa^{-3} a^{-1}
+#A1 = 2.89165e-13*yearinsec*1.0e18 
+#A2 = 2.42736e-02*yearinsec*1.0e18 
+#Q1 = 60.0e3
+#Q2 = 115.0e3
+
+Header
+  Mesh DB "." "flatslabnewt_R5000"
+End
+
+Constants
+  Water Density = Real #rhow
+End
+
+! parameters and conversion factors
+$ sec_per_yr = 365.25*24*60*60
+$ Pa_per_MPa = 1.0e6
+$ n = 1.0
+$ A = 5.0e-15 * (sec_per_yr^-1)^-1 * (Pa_per_MPa^-1)^-n ![MPa^-1 yr^-1]
+$ Lx = 100000.0                    ![m]
+$ alphadeg = 0.1 ![deg]
+$ alpha_s = -alphadeg*3.14159/180         ![rad]
+$ Hp = 3000.0                 ![m]
+!$ Hv = Hp * cos(alpha_s)  ![m]
+$ bW = 0.0                      ! west wall (x=0)
+$ bE = 0        ! east wall (x=Lx)
+$ sW = Hp           ![m]
+$ sE = Hp           ![m]
+$ m        = 1.0
+$ gamma = 0.1
+$ C        = 3*gamma/A/Hp/(3-2*gamma) ![MPa yr m^-1], works for n=m=1
+$ rhoi = 917.0/(1.0e6* sec_per_yr^2) ![MPa m^-1 yr^-2]
+$ g = -9.81* sec_per_yr^2 ![m yr^-2]
+
+! parameters for patch
+$ xc = Lx/2            ![m] patch center x
+$ yc = Lx/2            ![m] patch center y
+$ R = 5000.0             ![m] patch radius
+$ C_out = C       ! C value outside patch
+$ C_in = 0.0      ! C value inside patch (0 for shear-free)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Simulation
+  Coordinate System  =  Cartesian 3D 
+  Simulation Type = Steady        
+
+  Extruded Mesh Levels = Integer 12
+
+  Steady State Min Iterations = 1
+  Steady State Max Iterations = 1
+
+  Output File = "flatslabnewt_R5000_H3000_a01_G01_periodicBC".result"
+  Post File = "flatslabnewt_R5000_H3000_a01_G01_periodicBC".vtu"
+  max output level = 3 
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! The ice 
+Body 1
+  Equation = 1
+  Body Force = 1
+  Material = 1
+  Initial Condition = 1
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Initial Condition 1
+  Pressure = Real 0.0 
+  Velocity 1 = Real 0.0 
+  Velocity 2 = Real 0.0 
+  Velocity 3 = Real 0.0 
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Body Force 1
+  Flow BodyForce 1 = Real $g*sin(alpha_s)                          
+  Flow BodyForce 2 = Real 0.0
+  Flow BodyForce 3 = Real $g*cos(alpha_s) 
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Material 1
+  Density = Real #rhoi   
+  Viscosity Model = String "glen"
+  Viscosity = 1.0 ! Dummy but avoid warning output
+  Glen Exponent = Real 1.0
+  Set Arrhenius Factor = Logical True
+  Arrhenius Factor = Real $A
+  Glen Enhancement Factor = Real 1.0
+  Critical Shear Rate = Real 1.0e-10
+  Cauchy = Logical False 
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Solver 1
+  Exec Solver = "Before Simulation"
+  Equation = "Read DEMs"
+  Procedure = "ElmerIceSolvers" "Grid2DInterpolator"
+
+  ! Bed
+  Variable 1 = String "bedDEM"
+  Variable 1 data file = File "./DEMs/slabbed_flat_H3000m.dat"
+  Variable 1 x0 = Real 0.0
+  Variable 1 y0 = Real 0.0
+  Variable 1 lx = Real 100000.0
+  Variable 1 ly = Real 100000.0
+  Variable 1 Nx = Integer 101
+  Variable 1 Ny = Integer 101
+  Variable 1 Invert = Logical False
+  Variable 1 Fill = Logical False
+  Variable 1 Position Tol = Real 1.0e-1
+
+  ! Surface
+  Variable 2 = String "ZsDEM"
+  Variable 2 data file = File "./DEMs/slabsurf_flat_H3000m.dat"
+  Variable 2 x0 = Real 0.0
+  Variable 2 y0 = Real 0.0
+  Variable 2 lx = Real 100000.0
+  Variable 2 ly = Real 100000.0
+  Variable 2 Nx = Integer 101
+  Variable 2 Ny = Integer 101
+  Variable 2 Invert = Logical False
+  Variable 2 Fill = Logical False
+  Variable 2 Position Tol = Real 1.0e-1
+End
+
+
+Solver 2  
+  Equation = "MapCoordinate"
+  Procedure = "StructuredMeshMapper" "StructuredMeshMapper"
+
+  Active Coordinate = Integer 3
+  Mesh Velocity Variable = String "dSdt"
+  Mesh Update Variable = String "dS"
+  Mesh Velocity First Zero = Logical True
+
+  Displacement Mode = Logical False
+  Correct Surface = Logical True
+  Minimum Height = Real 1.0
+End
+
+
+Solver 3
+  Equation = "Navier-Stokes"
+  
+  Stabilization Method = String Stabilized
+  Flow Model = Stokes
+
+  Exported Variable 1 = -dofs 1 "dSdt" 
+  Exported Variable 2 = -dofs 1 "dS" 
+  Exported Variable 3 = -dofs 1 "BedDEM"
+  Exported Variable 4 = -dofs 1 "ZsDEM"
+
+  Linear System Solver = Iterative      
+  Linear System Iterative Method = BICGStab
+   
+  Linear System Preconditioning = ILU0
+  Linear System Convergence Tolerance = Real 1.0e-8
+  !Linear System Convergence Tolerance = Real 1.0e1
+  Linear System Max Iterations = 1000
+  Linear System Residual Output = 500
+  !Linear System Abort Not Converged = True 
+  Linear System Abort Not Converged = False
+
+  Nonlinear System Max Iterations = 50
+  !Nonlinear System Max Iterations = 5
+  Nonlinear System Convergence Tolerance  = 1.0e-5
+  Nonlinear System Newton After Iterations = 5
+  Nonlinear System Newton After Tolerance = 1.0e-02
+  Nonlinear System Relaxation Factor = 1.00
+
+  Steady State Convergence Tolerance = Real 1.0e-3
+End
+
+Solver 4
+  Equation = "Sij"
+  Procedure = "ElmerIceSolvers" "ComputeDevStress"          
+  Variable = -nooutput "Sij"
+  Variable DOFs = 1
+  Exported Variable 1 = -dofs 6 "Stress"
+  Stress Variable Name = String "Stress"
+  Flow Solver Name = String "Flow Solution"
+  !Linear System Solver = Direct  
+  !Linear System Direct Method = umfpack
+  Linear System Solver = Iterative       
+  Linear System Iterative Method = BiCGStab
+  Linear System Preconditioning = Diagonal
+  Linear System Convergence Tolerance = 1e-8
+  Linear System Max Iterations = 1000
+End
+
+Solver 5
+  Equation = "EigenStresses"
+  Procedure = "ElmerIceSolvers" "ComputeEigenValues"
+  Variable = -nooutput dumy
+  Variable DOFs = 1
+
+  Tensor Variable Name = String "Stress" 
+  
+  ! The 3 eigenvalues
+  Exported Variable 1 = EigenStress
+  Exported Variable 1 DOFS = 3
+
+  ! The 3 eigenvectors (Option)
+  Exported Variable 2 = EigenVector1
+  Exported Variable 2 DOFS = 3
+  Exported Variable 3 = EigenVector2
+  Exported Variable 3 DOFS =  3
+  Exported Variable 4 = EigenVector3
+  Exported Variable 4 DOFS = 3
+End
+
+Solver 6
+  Exec Solver = "Before Simulation"
+  Equation  = "Normal Vector"
+  Procedure = "ElmerIceSolvers" "ComputeNormalSolver"
+  Variable  = -dofs 3 "Normal Vector"
+  ComputeAll = Logical False
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Equation 1
+  Active Solvers(6) = 1 2 3 4 5 6
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! =========================
+! LATERAL WALLS (IDs 1–4)
+! =========================
+! Use Normal–Tangential form so you don’t care which global axis is normal.
+
+! SOUTH wall (y = 0)  -> ID 1
+!Boundary Condition 1
+!  Target Boundaries = 1
+!  Normal-Tangential Velocity = Logical False
+!  Velocity 2 = Real 0.0         ! no penetration in y-direction
+!  Slip Coefficient 1 = Real 0.0 ! free-slip tangential 1 (x-direction)
+!  Slip Coefficient 3 = Real 0.0 ! free-slip tangential 2 (z-direction)
+!End
+Boundary Condition 1
+  Target Boundaries = 1
+End
+
+! EAST wall (x = 1000) -> ID 2
+Boundary Condition 2
+  Name = "east_outflow"
+  Target Boundaries = 2
+  Periodic BC = 4
+  Periodic BC Translate(3) = $ (Lx) (0.0) (0.0)
+  Periodic BC Velocity 1 = Logical True
+  Periodic BC Velocity 2 = Logical True
+  Periodic BC Velocity 3 = Logical True
+  Periodic BC Pressure = Logical True
+  Periodic BC Zb = Logical True
+End
+
+! NORTH wall (y = 1000) -> ID 3
+!Boundary Condition 3
+!  Target Boundaries = 3
+!  Normal-Tangential Velocity = Logical False
+!  Velocity 2 = Real 0.0         ! no penetration in y-direction
+!  Slip Coefficient 1 = Real 0.0 ! free-slip tangential 1 (x-direction)
+!  Slip Coefficient 3 = Real 0.0 ! free-slip tangential 2 (z-direction)
+!End
+Boundary Condition 3
+  Target Boundaries = 3
+  Periodic BC = 1
+  Periodic BC Translate(3) = $(0.0) (Lx) (0.0)
+  Periodic BC Velocity 1 = Logical True
+  Periodic BC Velocity 2 = Logical True
+  Periodic BC Velocity 3 = Logical True
+  Periodic BC Pressure = Logical True
+  Periodic BC Zb = Logical True
+End
+
+! WEST wall (x = 0) -> ID 4
+Boundary Condition 4
+  Name = "west_inflow"
+  Target Boundaries = 4
+End
+
+! =========================
+! BED (BOTTOM SURFACE)
+! =========================
+! Keep your existing choice: no-slip OR sliding (comment the other).
+
+Boundary Condition 5
+  Bottom Surface = Equals bedDEM
+
+  ! ---- No sliding (stick) ----
+  !Velocity 1 = Real 0.0
+  !Velocity 2 = Real 0.0
+  !Velocity 3 = Real 0.0
+  
+  ComputeNormal = Logical True
+  !Flow Force BC = Logical True
+  Normal-Tangential Velocity = Logical True
+  
+  ! impermeable bed
+  Velocity 1 = Real 0.0
+  
+  Slip Coefficient 2 =  Variable Coordinate 1
+    Real Procedure "ElmerIceUSF" "Sliding_Weertman"
+  Slip Coefficient 3 = Variable Coordinate 1
+    Real Procedure "ElmerIceUSF" "Sliding_Weertman"
+
+  Weertman Exponent = Real $m
+  Weertman Linear Velocity = Real 1.0e-4
+  !Weertman Friction Coefficient = Real $C_out
+
+  Weertman Friction Coefficient = Variable Coordinate 1, Coordinate 2
+    Real MATC "(1 - (((tx[0] - xc)^2 + (tx[1] - yc)^2) < R^2)) * C_out"
+
+  ! ---- OR Sliding (Navier slip) ----
+  ! Normal-Tangential Velocity = Logical True
+  ! Velocity 1 = Real 0.0          ! impermeable bed
+  ! Slip Coefficient 2 = Real 0.1  ! tangential friction #1
+  ! Slip Coefficient 3 = Real 0.1  ! tangential friction #2
+End
+
+
+! =========================
+! TOP (UPPER SURFACE)
+! =========================
+Boundary Condition 6
+  Top Surface = Equals ZsDEM
+End
