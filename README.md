@@ -48,8 +48,8 @@ below.*
 
 - **Viscous (real topography)** — full-Stokes, Glen rheology, SICOPOLIS
   temperature profile. Each lake tile runs pre-drainage (no patch) and
-  post-drainage (circular free-slip patch, R = 2.5 km, under the drained
-  lake); basal friction c_b is calibrated per lake to observed speed.
+  post-drainage (circular free-slip patch, $R$ = 2.5 km, under the drained
+  lake); basal friction $c_b$ is calibrated per lake to observed speed.
 - **Elastic (real topography)** — linear elasticity on the same tiles.
   Post-drainage is a pressurized subglacial blister (bed-uplift DEM at the
   calibrated water pressure); the stress perturbation is blister minus
@@ -68,8 +68,8 @@ them in [ParaView](https://www.paraview.org/).
 
 ### Quickstart: a laptop-sized worked example
 
-Idealized Newtonian slab, H = 1000 m, surface slope 0.5°, free-slip patch
-R = 2500 m — one of the simulations in Fig. 3D. Runs in well under an hour
+Idealized Newtonian slab, $H$ = 1000 m, surface slope $\alpha$ = 0.5°, free-slip
+patch $R$ = 2500 m — one of the simulations in Fig. 3D. Runs in well under an hour
 on an ordinary laptop:
 
 ```bash
