@@ -40,11 +40,11 @@ Lake directories use the paper's lake IDs; [MANIFEST.md](MANIFEST.md) maps
 them to the internal IDs in the filenames, lists the calibrated per-lake
 parameters, and records which figure every simulation appears in.
 
-![Lake 2511 overview](assets/lake2511_overview.gif)
-*The seven center-lake tiles (gold: lake 2511). Right, cycling: lake 2511's
+![Lake 2394 overview](assets/lake2394_overview.gif)
+*The seven center-lake tiles (gold: lake 2394). Right, cycling: lake 2394's
 tile through pre/post-drainage Sentinel-2 imagery and the simulated viscous
 surface stress $\sigma_{t1}$ pre, post, and drainage-induced change, with the
-viscous stress space evolving alongside (gold rings: lake 2511's tile).*
+viscous stress space evolving alongside (gold rings: lake 2394's tile).*
 
 ## The simulations
 
@@ -101,11 +101,11 @@ shipped runs the no-patch (pre-drainage) case; two header variables switch
 it to the post-drainage free-slip-patch case:
 
 ```bash
-cd elmer-ice/real_topography/viscous/lake2511
+cd elmer-ice/real_topography/viscous/lake2394
 docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
   bash -lc "elmerf90 PROG/USF_TAVz.F90 -o PROG/USF_TAVz && \
-            ElmerGrid 14 2 lake2511_d25km_r2500m.msh -autoclean && \
-            ElmerSolver lake2511_glen_d25km_r2500m_tsic_base.sif"   # no-patch case
+            ElmerGrid 14 2 lake2394_d25km_r2500m.msh -autoclean && \
+            ElmerSolver lake2394_glen_d25km_r2500m_tsic_base.sif"   # no-patch case
 ```
 
 For the patch case, edit the SIF header — `patch_nopatch_str = "patch"` and
