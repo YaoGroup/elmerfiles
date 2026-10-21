@@ -19,20 +19,102 @@ whose data and code are archived on Zenodo at
 plus the idealized-slab simulations from the SI.
 
 Each simulation directory is self-contained and ready to run: the `.sif`, the
-mesh geometry (`.geo`), and the DEM / auxiliary inputs that simulation needs,
-with a short README giving the commands to mesh and run it.
+mesh (`.geo` source and `.msh`), and the DEM / auxiliary inputs that
+simulation needs. See **Running the simulations** below for the complete
+zero-to-run commands.
 
 ## Layout
 
 ```
 elmerice/
-├── real_topography/        # 25 km × 25 km tiles on real Greenland topography
-│   ├── viscous/            # free-slip slippery-patch simulations (pre/post drainage)
-│   │   └── 2019cwNNNN/     # one directory per center-lake tile
-│   └── elastic/            # pressurized-blister elastic simulations
-│       └── 2019cwNNNN/
-└── idealized/              # idealized-slab simulations from the SI
+├── real_topography/
+│   ├── viscous/lakeNNNN/            # Glen free-slip-patch sim per lake: SIF, mesh,
+│   │   │                            #   DEMs (bed/surface/speed), PROG/ user function
+│   │   └── lake2394/resolution_convergence/   # coarse/mid/fine mesh runs (SI)
+│   └── elastic/lakeNNNN/            # reference + calibrated-blister SIFs, mesh, DEMs
+│       └── lake2394/patch_experiments_E9GPa/  # basal-sliding sweep (SI)
+└── idealized/                       # 26 Newtonian flat-slab sims (published Fig. 3)
 ```
+
+Lake directories use the paper's lake IDs; [MANIFEST.md](MANIFEST.md) maps
+them to the internal IDs in the filenames, lists the calibrated per-lake
+parameters, and records which figure every simulation appears in.
+`figs/` holds figure-generation scripts.
+
+![Center lakes map](figs/center_lakes_map/center_lakes_map_2511gold.png)
+*The seven center-lake tiles. Gold: lake 2511, used as the featured example
+below.*
+
+## The simulations
+
+- **Viscous (real topography)** — full-Stokes, Glen rheology, SICOPOLIS
+  temperature profile. Each lake tile runs pre-drainage (no patch) and
+  post-drainage (circular free-slip patch, R = 2.5 km, under the drained
+  lake); basal friction c_b is calibrated per lake to observed speed.
+- **Elastic (real topography)** — linear elasticity on the same tiles.
+  Post-drainage is a pressurized subglacial blister (bed-uplift DEM at the
+  calibrated water pressure); the stress perturbation is blister minus
+  undisturbed reference.
+- **Idealized** — Newtonian flat slabs with a circular free-slip patch,
+  validating the paper's analytical solution (Fig. 3).
+  <!-- interactive explorer link goes here once deployed -->
+
+## Running the simulations
+
+All you need is [Docker](https://docs.docker.com/get-docker/); the
+`andrewdnolan/elmerice` image contains the full Elmer v9.0 + Elmer/Ice stack
+(ElmerGrid, ElmerSolver, the Elmer/Ice solver and user-function libraries,
+MUMPS, Lua). Outputs are VTU files written into the mesh directory — view
+them in [ParaView](https://www.paraview.org/).
+
+### Quickstart: a laptop-sized worked example
+
+Idealized Newtonian slab, H = 1000 m, surface slope 0.5°, free-slip patch
+R = 2500 m — one of the simulations in Fig. 3D. Runs in well under an hour
+on an ordinary laptop:
+
+```bash
+git clone https://github.com/YaoGroup/pnas2026-solverfiles.git
+cd pnas2026-solverfiles/elmerice/idealized
+docker pull andrewdnolan/elmerice
+
+# 1) convert the gmsh mesh to an Elmer mesh database (creates flatslabnewt_R2500/)
+docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
+  ElmerGrid 14 2 flatslabnewt_R2500.msh -autoclean
+
+# 2) run the solver
+docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
+  ElmerSolver flatslabnewt_R2500_H1000_a05_G01_periodicBC.sif
+
+# 3) result: flatslabnewt_R2500/flatslabnewt_R2500_H1000_a05_G01_periodicBC_t0001.vtu
+```
+
+Every other simulation follows the same mesh-then-solve pattern; only the
+compute requirements differ (see the table below).
+
+### Real topography, viscous (Glen rheology)
+
+Each `real_topography/viscous/lakeNNNN/` directory is self-contained. The
+temperature user function is compiled once per directory, and the SIF as
+shipped runs the no-patch (pre-drainage) case; two header variables switch
+it to the post-drainage free-slip-patch case:
+
+```bash
+cd elmerice/real_topography/viscous/lake2511
+docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
+  bash -lc "elmerf90 PROG/USF_TAVz.F90 -o PROG/USF_TAVz && \
+            ElmerGrid 14 2 lake2511_d25km_r2500m.msh -autoclean && \
+            ElmerSolver lake2511_glen_d25km_r2500m_tsic_base.sif"   # no-patch case
+```
+
+For the patch case, edit the SIF header — `patch_nopatch_str = "patch"` and
+`R = 2500` — and run `ElmerSolver` again.
+
+### Real topography, elastic
+
+One SIF per case — the undisturbed reference (`*_nopatch_u0p0*.sif`) and the
+pressurized blister (`*_blister_u0p0_Pw*.sif`) — with the same
+mesh-then-solve pattern and no user-function compilation.
 
 ## Software versions
 
