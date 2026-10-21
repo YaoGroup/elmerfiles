@@ -12,7 +12,8 @@ elastic (pressurized subglacial blister) stress-perturbation simulations of
 seven supraglacial-lake tiles on real Greenland topography (lakes 1910, 1951,
 2394, 2411, 2416, 2511, 2520 in the naming of the
 [Dunmire et al. 2025](https://doi.org/10.1029/2024EA003793) lake catalog,
-archived at the [UCAR data commons](https://data.ucar.edu/el/dataset/83c58663-99e3-453f-a9a0-6536ea87ffda)),
+whose data and code are archived on Zenodo at
+[10.5281/zenodo.14587026](https://doi.org/10.5281/zenodo.14587026)),
 plus the idealized-slab simulations from the SI.
 
 Each simulation directory is self-contained and ready to run: the `.sif`, the
