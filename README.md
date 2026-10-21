@@ -6,11 +6,13 @@ Elmer/Ice solver input files for:
 > Gagliardini, O., & Stevens, L. A. (2026). *From blistering to sliding:
 > Ice-sheet stress perturbations from water injection to the bed.* PNAS.
 
-These are the exact solver input files (`.sif`) used for the full-Stokes
+These are the solver input files (`.sif`) used for the full-Stokes
 Elmer/Ice simulations in the paper: viscous (free-slip slippery patch) and
 elastic (pressurized subglacial blister) stress-perturbation simulations of
 seven supraglacial-lake tiles on real Greenland topography (lakes 1910, 1951,
-2394, 2411, 2416, 2511, 2520 in the naming of the Dunmire et al. 2021 catalog),
+2394, 2411, 2416, 2511, 2520 in the naming of the
+[Dunmire et al. 2025](https://doi.org/10.1029/2024EA003793) lake catalog,
+archived at the [UCAR data commons](https://data.ucar.edu/el/dataset/83c58663-99e3-453f-a9a0-6536ea87ffda)),
 plus the idealized-slab simulations from the SI.
 
 Each simulation directory is self-contained and ready to run: the `.sif`, the
@@ -36,7 +38,15 @@ if added later, would live in a sibling directory.)
 
 - **Elmer/Ice: Elmer v 9.0 (Rev: cf291b69, compiled 2021-11-03)**, with MUMPS
   and the Lua interpreter linked in.
-- Production runs used the Docker image `andrewdnolan/elmerice`.
+- Production runs used the Docker image
+  [`andrewdnolan/elmerice`](https://hub.docker.com/r/andrewdnolan/elmerice)
+  (`docker pull andrewdnolan/elmerice`).
+
+## More on Elmer/Ice
+
+- Elmer/Ice project site, wiki, and course tutorials: <http://elmerice.elmerfem.org>
+- Elmer source code (includes the Elmer/Ice solvers): <https://github.com/ElmerCSC/elmerfem>
+- Elmer documentation: <https://www.elmerfem.org>
 
 ## Status
 
