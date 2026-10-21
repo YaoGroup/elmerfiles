@@ -9,7 +9,9 @@ Elmer/Ice solver input files for:
 These are the solver input files (`.sif`) used for the full-Stokes
 Elmer/Ice simulations in the paper: viscous (free-slip slippery patch) and
 elastic (pressurized subglacial blister) stress-perturbation simulations of
-seven supraglacial-lake tiles on real Greenland topography (lakes 1910, 1951,
+seven supraglacial-lake tiles on real Greenland topography — ice surface and
+bed from [BedMachine Greenland Version 5](https://doi.org/10.5067/GMEVBWFLWA7X)
+(Morlighem et al., NSIDC) — (lakes 1910, 1951,
 2394, 2411, 2416, 2511, 2520 in the naming of the
 [Dunmire et al. 2025](https://doi.org/10.1029/2024EA003793) lake catalog,
 whose data and code are archived on Zenodo at
@@ -39,6 +41,23 @@ elmerice/
 - Production runs used the Docker image
   [`andrewdnolan/elmerice`](https://hub.docker.com/r/andrewdnolan/elmerice)
   (`docker pull andrewdnolan/elmerice`).
+
+## Computational requirements
+
+Every simulation here runs **serially** (a single MPI task with one thread;
+the direct MUMPS solver dominates the runtime). Wall times below are measured
+from the production run logs on a Google Cloud `n1-highmem-64` instance.
+
+| Category | Mesh size | Wall time per solve | Memory |
+|---|---|---|---|
+| Real topography, viscous | ~46.8k-node footprint × 20 levels (~0.9 M nodes) | ~6–25 h | large — see note |
+| Real topography, elastic | same mesh | ~12–16 h | large — see note |
+| Idealized slab | ~1k-node footprint × 30 levels | minutes to ~1.7 h | laptop-friendly |
+
+**Memory note:** the production runs were limited to 4 simultaneous solves on
+a 416 GB instance by memory; budget on the order of 100 GB RAM per
+real-topography solve. The idealized-slab cases run comfortably on an
+ordinary workstation or laptop.
 
 ## More on Elmer/Ice
 
