@@ -147,8 +147,3 @@ ordinary workstation or laptop.
 - Elmer/Ice project site, wiki, and course tutorials: <http://elmerice.elmerfem.org>
 - Elmer source code (includes the Elmer/Ice solvers): <https://github.com/ElmerCSC/elmerfem>
 - Elmer documentation: <https://www.elmerfem.org>
-
-## Status
-
-Under construction — contents are being assembled and verified against the
-production run inputs. Do not use until this notice is removed.
