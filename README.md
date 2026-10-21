@@ -41,8 +41,12 @@ them to the internal IDs in the filenames, lists the calibrated per-lake
 parameters, and records which figure every simulation appears in.
 
 ![Center lakes map](assets/center_lakes_map_2511gold.png)
-*The seven center-lake tiles. Gold: lake 2511, used as the featured example
-below.*
+*The seven center-lake tiles. Gold: lake 2511, featured below.*
+
+![Lake 2511 sequence](assets/lake2511_sequence.gif)
+*Lake 2511's tile: pre/post-drainage Sentinel-2 imagery, the simulated
+viscous surface stress $\sigma_{t1}$ before and after drainage, and the
+drainage-induced change — beside the seven-lake viscous stress space.*
 
 ## The simulations
 
