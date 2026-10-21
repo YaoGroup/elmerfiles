@@ -34,7 +34,7 @@ and the SI per-lake elastic overview and phase-space figures.
 `patch_perturbation_vs_ub` figure. The E value differs from the rest of the
 paper by design; this is faithful to what that figure shows.
 
-**`idealized/`** — 26 Newtonian flat-slab simulations (`flatslabnewt_*_G01`)
+**`idealized_slab/`** — 26 Newtonian flat-slab simulations (`flatslabnewt_*_G01`)
 behind published Fig. 3: the sim-vs-theory maps (panel A), profile collapse
 (panel C) and maxima scatter (panel D), plus the SI polar stress comparison.
 All have cH/η = 0.1 (`G01`). `flatslabnewt_R2500_H1000_a05_G01` is the

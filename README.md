@@ -33,7 +33,7 @@ elmer-ice/
 │   │   └── lake2394/resolution_convergence/   # coarse/mid/fine mesh runs (SI)
 │   └── elastic/lakeNNNN/            # reference + calibrated-blister SIFs, mesh, DEMs
 │       └── lake2394/patch_experiments_E9GPa/  # basal-sliding sweep (SI)
-└── idealized/                       # 26 Newtonian flat-slab sims (published Fig. 3)
+└── idealized_slab/                  # 26 Newtonian flat-slab sims (published Fig. 3)
 ```
 
 Lake directories use the paper's lake IDs; [MANIFEST.md](MANIFEST.md) maps
@@ -75,7 +75,7 @@ on an ordinary laptop:
 
 ```bash
 git clone https://github.com/YaoGroup/pnas2026-solverfiles.git
-cd pnas2026-solverfiles/elmer-ice/idealized
+cd pnas2026-solverfiles/elmer-ice/idealized_slab
 docker pull andrewdnolan/elmerice
 
 # 1) convert the gmsh mesh to an Elmer mesh database (creates flatslabnewt_R2500/)
