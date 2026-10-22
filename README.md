@@ -60,7 +60,9 @@ viscous stress space evolving alongside (gold rings: lake 2394's tile).*
   undisturbed reference.
 - **Idealized** — Newtonian flat slabs with a circular free-slip patch,
   validating the paper's analytical solution (Fig. 3).
-  <!-- interactive explorer link goes here once deployed -->
+  **[Explore these simulations interactively](https://yaogroup.github.io/pnas2026-slab-explorer/)**
+  — sweep $H$, $\alpha$, $\gamma$, $R$ and compare simulation, theory, and
+  difference for every stress component.
 
 ## Running the simulations
 
