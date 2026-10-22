@@ -1,0 +1,238 @@
+:root {
+  --bg: #000;
+  --fg: #f5f5f5;
+  --gold: #e8b94a;
+  --gold-bright: #f4cf6a;
+  --gold-dim: rgba(245, 199, 94, 0.42);
+  --sv-thumb: 58px;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+a { color: var(--gold-bright); }
+
+.hd { max-width: 1200px; margin: 0 auto; padding: 2.2rem 1.4rem 0.6rem; }
+.hd h1 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 2.6rem;
+  color: var(--gold);
+  margin: 0;
+}
+.hd-sub {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.35rem;
+  color: var(--gold-bright);
+  margin: 0.15rem 0 0.9rem;
+}
+.hd-note { max-width: 62rem; font-size: 0.98rem; line-height: 1.55; color: #cfcfcf; margin: 0; }
+.hd-note b { color: var(--fg); }
+
+.sv { max-width: 1200px; margin: 0 auto; padding: 1.6rem 1.4rem 2rem; }
+.sv-wait { min-height: 200px; color: #888; }
+
+/* ── sliders ── */
+.sv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem 2.6rem;
+  margin-bottom: 1.6rem;
+}
+.sv-sl {
+  display: grid;
+  grid-template-columns: 1.6rem 150px auto;
+  align-items: center;
+  column-gap: 0.7rem;
+}
+.sv-sym {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--gold-bright);
+  text-align: right;
+  grid-row: 1;
+}
+.sv-val {
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  grid-row: 1;
+}
+.sv-track { position: relative; grid-row: 1; }
+.sv-sl input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  border-radius: 3px;
+  background: var(--gold-dim);
+  cursor: pointer;
+  display: block;
+}
+.sv-sl input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f5c75e;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+}
+.sv-sl input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f5c75e;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+}
+/* the notches: one dot + value label per available stop */
+.sv-ticks { position: relative; height: 1.25rem; margin-top: 2px; }
+.sv-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.sv-tick i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+}
+.sv-tick span { font-size: 0.68rem; color: #9a9a9a; font-variant-numeric: tabular-nums; }
+.sv-tick.on i { background: var(--gold-bright); }
+.sv-tick.on span { color: var(--gold-bright); }
+
+/* ── body: picker + big panel ── */
+.sv-body { display: flex; gap: 2.4rem; align-items: flex-start; }
+.sv-pick { flex: none; display: flex; flex-direction: column; gap: 4px; }
+.sv-head, .sv-row {
+  display: grid;
+  grid-template-columns: 3.6rem repeat(4, var(--sv-thumb));
+  gap: 4px;
+  align-items: center;
+}
+.sv-head span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  text-align: center;
+  white-space: nowrap;
+}
+.sv-row-label {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.3rem;
+  color: #f5f0e6;
+  text-align: right;
+  padding-right: 0.4rem;
+}
+.sv-row-label sub { font-size: 0.68em; }
+.sv-cell {
+  width: var(--sv-thumb);
+  height: var(--sv-thumb);
+  padding: 0;
+  border: 1.5px solid rgba(245, 199, 94, 0.25);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+.sv-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sv-cell:hover { border-color: rgba(245, 199, 94, 0.7); }
+.sv-cell--on { border: 2.5px solid var(--gold); box-shadow: 0 0 12px rgba(245, 199, 94, 0.5); }
+
+.sv-paper {
+  flex: 1;
+  min-width: 0;
+  max-width: min(560px, 60vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sv-title { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
+.sv-title-col {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.6rem;
+  color: var(--gold-bright);
+}
+.sv-title img { display: block; }
+
+.sv-plot {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+  width: 100%;
+  column-gap: 2.6rem;
+}
+.sv-ylab {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  align-self: center;
+  font-size: 1rem;
+}
+.sv-img { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: 1.8rem; }
+.sv-img > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 1px solid rgba(245, 199, 94, 0.6);
+}
+.sv-over { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sv-patch { fill: none; stroke: #0a0a0a; stroke-width: 2.4; stroke-dasharray: 6 4; }
+.sv-xt {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 0.3rem);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.sv-yt {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: calc(100% + 0.4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.sv-xt span, .sv-yt span { line-height: 1; }
+.sv-xlab { grid-column: 2; text-align: center; font-size: 1rem; }
+
+.sv-cbar { width: 70%; margin-top: 1rem; }
+.sv-cbar-bar {
+  height: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+  background: linear-gradient(to right, #00004c, #0000ff 25%, #ffffff 50%, #ff0000 75%, #800000);
+}
+.sv-cbar-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+.sv-cbar-note { margin-top: 0.3rem; font-size: 0.8rem; color: #9a9a9a; text-align: center; }
+.sv-max { margin-top: 0.5rem; font-size: 1.05rem; }
+
+.ft { max-width: 1200px; margin: 0 auto; padding: 0 1.4rem 2.5rem; }
+.ft p { font-size: 0.88rem; color: #9a9a9a; line-height: 1.5; }
+
+@media (max-width: 1100px) {
+  .sv-body { flex-direction: column; }
+  .sv-paper { max-width: 100%; }
+}

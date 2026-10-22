@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Idealized slab explorer</title>
+<meta name="description" content="Interactive explorer of the idealized-slab Elmer/Ice sweep vs the analytical theory — Lai, Rines, Coffey et al. (2026), PNAS." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="hd">
+  <h1>The idealized slab</h1>
+  <p class="hd-sub">simulation &middot; theory &middot; difference</p>
+  <p class="hd-note">
+    Full-Stokes Elmer/Ice simulations of a Newtonian slab with a circular
+    free-slip patch (radius <i>R</i>, thickness <i>H</i>, surface slope
+    <i>&alpha;</i>, sliding ratio <i>&gamma;</i>), against the paper&rsquo;s
+    analytical solution. Depth-averaged stress perturbations, in kPa.
+    The colour scale is <b>fixed per field</b> &mdash; it does not change
+    with the sliders.
+  </p>
+</header>
+
+<main class="sv" id="app">
+  <div class="sv-wait" id="wait">loading&hellip;</div>
+</main>
+
+<footer class="ft">
+  <p>
+    Lai, Rines, Coffey, Lee, Clerc, Hilditch, Gagliardini &amp; Stevens (2026),
+    <i>From blistering to sliding: Ice-sheet stress perturbations from water
+    injection to the bed</i>, PNAS.
+    Solver input files:
+    <a href="https://github.com/YaoGroup/pnas2026-solverfiles">YaoGroup/pnas2026-solverfiles</a>.
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
