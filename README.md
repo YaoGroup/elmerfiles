@@ -40,6 +40,8 @@ Lake directories use the paper's lake IDs; [MANIFEST.md](MANIFEST.md) maps
 them to the internal IDs in the filenames, lists the calibrated per-lake
 parameters, and records which figure every simulation appears in.
 
+## Graphical summary
+
 ![Lake 2394 overview](assets/lake2394_overview.gif)
 *The seven center-lake tiles (gold: lake 2394). Right, cycling: lake 2394's
 tile through pre/post-drainage Sentinel-2 imagery and the simulated viscous
