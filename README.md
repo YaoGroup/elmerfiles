@@ -11,12 +11,13 @@ Elmer/Ice simulations in the paper: viscous (free-slip slippery patch) and
 elastic (pressurized subglacial blister) stress-perturbation simulations of
 seven supraglacial-lake tiles on real Greenland topography — ice surface and
 bed from [BedMachine Greenland Version 5](https://doi.org/10.5067/GMEVBWFLWA7X)
-(Morlighem et al., NSIDC) — (lakes 1910, 1951,
-2394, 2411, 2416, 2511, 2520 in the naming of the
+(Morlighem et al., NSIDC) — the paper's five center lakes (1951, 2394,
+2416, 2511, 2520) plus two additional simulated tiles (1910, 2411), numbered
+as in the
 [Dunmire et al. 2025](https://doi.org/10.1029/2024EA003793) lake catalog,
 whose data and code are archived on Zenodo at
-[10.5281/zenodo.14587026](https://doi.org/10.5281/zenodo.14587026)),
-plus the idealized-slab simulations from the SI.
+[10.5281/zenodo.14587026](https://doi.org/10.5281/zenodo.14587026).
+Also included: the idealized-slab simulations from the SI.
 
 Each simulation directory is self-contained and ready to run: the `.sif`, the
 mesh (`.geo` source and `.msh`), and the DEM / auxiliary inputs that
