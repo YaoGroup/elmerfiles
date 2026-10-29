@@ -1,21 +1,15 @@
-/* Idealized slab explorer — standalone port of the defense site's
-   Ch2SlabFieldViewer: sliders over the full-factorial sweep (notched at
-   the available values), field rows x Simulation | Theory | Difference |
-   x10 thumbnails, one big panel with the dashed free-slip patch, and a
-   per-field colour scale that is FIXED at every slider position. */
+/* Idealized slab explorer — the paper's analytical stress-perturbation
+   solution (Eq. 2): sliders over the parameter sweep (notched at the
+   available values), one thumbnail per field, one big panel with the
+   dashed free-slip patch, and a per-field colour scale that is FIXED at
+   every slider position. */
 'use strict';
 
 const DATA = 'data/';
-const COLS = [
-  { id: 'da', short: 'Simulation', title: 'Simulation' },
-  { id: 'theory', short: 'Theory', title: 'Theory' },
-  { id: 'diff', short: 'Difference', title: 'Simulation − Theory' },
-  { id: 'diff_zoom', short: '×10', title: 'Simulation − Theory · ×10' },
-];
 const PARAMS = [
   { key: 'H', sym: 'H', unit: 'km', fmt: (v) => num(v / 1000) },
   { key: 'alpha_deg', sym: 'α', unit: '°', fmt: (v) => num(v) },
-  { key: 'gamma', sym: 'γ', unit: '', fmt: (v) => num(v) },
+  { key: 'c0H_eta', sym: 'c₀H/η', unit: '', fmt: (v) => String(v) },
   { key: 'R', sym: 'R', unit: 'km', fmt: (v) => num(v / 1000) },
 ];
 const FIELD_HTML = {
@@ -34,14 +28,14 @@ function fmtKpa(v) {
 }
 
 let MAN = null;
-let byParams = {};            // "R|H|alpha|gamma" -> run id
-const state = { run: '', field: 'st1', col: 'da' };
+let byParams = {};            // "R|H|alpha|c0H_eta" -> run id
+const state = { run: '', field: 'st1' };
 
-function key(r) { return [r.R, r.H, r.alpha_deg, r.gamma].join('|'); }
+function key(r) { return [r.R, r.H, r.alpha_deg, r.c0H_eta].join('|'); }
 function run() { return MAN.runs[state.run]; }
-function src(f, c) {
+function src(f) {
   const r = run();
-  const p = r[c] && r[c][f];
+  const p = r.theory && r.theory[f];
   return p ? DATA + p : '';
 }
 
@@ -50,11 +44,9 @@ function readHash() {
   const h = new URLSearchParams(location.hash.slice(1));
   if (h.get('run') && MAN.runs[h.get('run')]) state.run = h.get('run');
   if (h.get('field') && MAN.fields_all.includes(h.get('field'))) state.field = h.get('field');
-  if (h.get('col') && COLS.some((c) => c.id === h.get('col'))) state.col = h.get('col');
 }
 function writeHash() {
-  history.replaceState(null, '',
-    `#run=${state.run}&field=${state.field}&col=${state.col}`);
+  history.replaceState(null, '', `#run=${state.run}&field=${state.field}`);
 }
 
 /* ── build ── */
@@ -93,28 +85,22 @@ function build() {
 
   const body = el('div', 'sv-body');
 
-  // picker
+  // picker: one thumbnail per field
   const pick = el('div', 'sv-pick');
-  const head = el('div', 'sv-head');
-  head.appendChild(el('span', ''));
-  for (const c of COLS) head.appendChild(el('span', '', c.short));
-  pick.appendChild(head);
   for (const f of MAN.fields_all) {
     const row = el('div', 'sv-row');
     const lab = el('span', 'sv-row-label');
     lab.innerHTML = FIELD_HTML[f] || f;
     row.appendChild(lab);
-    for (const c of COLS) {
-      const b = document.createElement('button');
-      b.className = 'sv-cell';
-      b.dataset.f = f; b.dataset.c = c.id;
-      b.setAttribute('aria-label', `${f} ${c.title}`);
-      const img = document.createElement('img');
-      img.alt = ''; img.draggable = false; img.loading = 'lazy'; img.decoding = 'async';
-      b.appendChild(img);
-      b.addEventListener('click', () => { state.field = f; state.col = c.id; render(); });
-      row.appendChild(b);
-    }
+    const b = document.createElement('button');
+    b.className = 'sv-cell';
+    b.dataset.f = f;
+    b.setAttribute('aria-label', f);
+    const img = document.createElement('img');
+    img.alt = ''; img.draggable = false; img.loading = 'lazy'; img.decoding = 'async';
+    b.appendChild(img);
+    b.addEventListener('click', () => { state.field = f; render(); });
+    row.appendChild(b);
     pick.appendChild(row);
   }
   body.appendChild(pick);
@@ -123,7 +109,7 @@ function build() {
   const paper = el('div', 'sv-paper');
   paper.innerHTML = `
     <div class="sv-title">
-      <span class="sv-title-col" id="colTitle"></span>
+      <span class="sv-title-col">Analytical solution</span>
       <img id="eqImg" alt="" />
     </div>
     <div class="sv-plot">
@@ -150,9 +136,9 @@ function build() {
 
 function onSlide(k, i) {
   const r = run();
-  const want = { R: r.R, H: r.H, alpha_deg: r.alpha_deg, gamma: r.gamma };
+  const want = { R: r.R, H: r.H, alpha_deg: r.alpha_deg, c0H_eta: r.c0H_eta };
   want[k] = MAN.params[k][i];
-  const id = byParams[[want.R, want.H, want.alpha_deg, want.gamma].join('|')];
+  const id = byParams[[want.R, want.H, want.alpha_deg, want.c0H_eta].join('|')];
   if (id) { state.run = id; render(); }
 }
 
@@ -173,16 +159,14 @@ function render() {
   }
 
   for (const b of document.querySelectorAll('.sv-cell')) {
-    b.classList.toggle('sv-cell--on', b.dataset.f === state.field && b.dataset.c === state.col);
-    b.querySelector('img').src = src(b.dataset.f, b.dataset.c);
+    b.classList.toggle('sv-cell--on', b.dataset.f === state.field);
+    b.querySelector('img').src = src(b.dataset.f);
   }
 
-  const col = COLS.find((c) => c.id === state.col);
-  document.getElementById('colTitle').textContent = col.title;
   const eq = document.getElementById('eqImg');
   eq.src = `assets/eq/fb_${state.field}.svg`;
   eq.style.height = '30px'; eq.style.width = 'auto';
-  document.getElementById('bigImg').src = src(state.field, state.col);
+  document.getElementById('bigImg').src = src(state.field);
 
   const d = r.domain_km;
   const patch = document.getElementById('patch');
@@ -197,14 +181,15 @@ function render() {
   document.getElementById('yt').innerHTML =
     [...ticks].reverse().map((t) => `<span>${t}</span>`).join('');
 
-  const vl = MAN.vlim_kpa[state.field] / (state.col === 'diff_zoom' ? 10 : 1);
+  const vl = MAN.vlim_kpa[state.field];
   document.getElementById('cbLo').textContent = '−' + num(vl);
   document.getElementById('cbHi').textContent = num(vl) + ' kPa';
-  const m = r.max_kpa;
-  const mv = state.col === 'da' ? m.sim_da[state.field]
-    : state.col === 'theory' ? m.theory[state.field] : m.diff_abs[state.field];
-  document.getElementById('maxTxt').textContent =
-    'max ' + (mv === undefined ? '—' : fmtKpa(mv));
+  const mv = r.max_kpa.theory[state.field];
+  const decayKm = (2 * r.H) / Math.sqrt(r.c0H_eta) / 1000;
+  document.getElementById('maxTxt').innerHTML =
+    'max ' + (mv === undefined ? '—' : fmtKpa(mv)) +
+    ' &nbsp;&middot;&nbsp; decay length √(4<i>ηH</i>/<i>c</i><sub>0</sub>) ≈ ' +
+    (decayKm >= 100 ? Math.round(decayKm) : decayKm >= 10 ? decayKm.toFixed(1) : decayKm.toFixed(2)) + ' km';
 
   writeHash();
 }

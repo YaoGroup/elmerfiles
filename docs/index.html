@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Idealized slab explorer</title>
-<meta name="description" content="Interactive explorer of the idealized-slab Elmer/Ice sweep vs the analytical theory — Lai, Rines, Coffey et al. (2026), PNAS." />
+<meta name="description" content="Interactive explorer of the analytical ice-slab stress-perturbation solution — Lai, Rines, Coffey et al. (2026)." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -13,14 +13,18 @@
 <body>
 <header class="hd">
   <h1>The idealized slab</h1>
-  <p class="hd-sub">simulation &middot; theory &middot; difference</p>
+  <p class="hd-sub">the analytical stress-perturbation solution</p>
   <p class="hd-note">
-    Full-Stokes Elmer/Ice simulations of a Newtonian slab with a circular
-    free-slip patch (radius <i>R</i>, thickness <i>H</i>, surface slope
-    <i>&alpha;</i>, sliding ratio <i>&gamma;</i>), against the paper&rsquo;s
-    analytical solution. Depth-averaged stress perturbations, in kPa.
-    The colour scale is <b>fixed per field</b> &mdash; it does not change
-    with the sliders.
+    The paper&rsquo;s analytical solution (Eq.&nbsp;2) for the depth-averaged
+    stress perturbation in a slab of ice (thickness <i>H</i>, surface slope
+    <i>&alpha;</i>) sliding over a circular free-slip patch (radius <i>R</i>),
+    with dimensionless basal slipperiness <i>c</i><sub>0</sub><i>H</i>/<i>&eta;</i>
+    outside the patch &mdash; <i>c</i><sub>0</sub> the basal traction coefficient,
+    <i>&eta;</i> the ice viscosity. The perturbation decays over
+    &radic;(4<i>&eta;H</i>/<i>c</i><sub>0</sub>) (Eq.&nbsp;3): a more slippery
+    bed (smaller <i>c</i><sub>0</sub><i>H</i>/<i>&eta;</i>) transmits stress
+    farther. Stresses in kPa; the colour scale is <b>fixed per field</b>
+    &mdash; it does not change with the sliders.
   </p>
 </header>
 
@@ -32,9 +36,9 @@
   <p>
     Lai, Rines, Coffey, Lee, Clerc, Hilditch, Gagliardini &amp; Stevens (2026),
     <i>From blistering to sliding: Ice-sheet stress perturbations from water
-    injection to the bed</i>, PNAS.
+    injection to the bed</i>.
     Solver input files:
-    <a href="https://github.com/YaoGroup/pnas2026-solverfiles">YaoGroup/pnas2026-solverfiles</a>.
+    <a href="https://github.com/YaoGroup/elmerfiles">YaoGroup/elmerfiles</a>.
   </p>
 </footer>
 

@@ -46,7 +46,7 @@ a { color: var(--gold-bright); }
 }
 .sv-sl {
   display: grid;
-  grid-template-columns: 1.6rem 150px auto;
+  grid-template-columns: max-content 230px auto;
   align-items: center;
   column-gap: 0.7rem;
 }
@@ -118,7 +118,7 @@ a { color: var(--gold-bright); }
 .sv-pick { flex: none; display: flex; flex-direction: column; gap: 4px; }
 .sv-head, .sv-row {
   display: grid;
-  grid-template-columns: 3.6rem repeat(4, var(--sv-thumb));
+  grid-template-columns: 3.6rem repeat(1, var(--sv-thumb));
   gap: 4px;
   align-items: center;
 }
