@@ -27,7 +27,7 @@ zero-to-run commands.
 ## Layout
 
 ```
-elmer-ice/
+solverfiles/
 ├── real_topography/
 │   ├── viscous/lakeNNNN/            # Glen free-slip-patch sim per lake: SIF, mesh,
 │   │   │                            #   DEMs (bed/surface/speed), PROG/ user function
@@ -81,7 +81,7 @@ on an ordinary laptop:
 
 ```bash
 git clone https://github.com/YaoGroup/elmerfiles.git
-cd elmerfiles/elmer-ice/idealized_slab
+cd elmerfiles/solverfiles/idealized_slab
 docker pull andrewdnolan/elmerice
 
 # 1) convert the gmsh mesh to an Elmer mesh database (creates flatslabnewt_R2500/)
@@ -106,7 +106,7 @@ shipped runs the no-patch (pre-drainage) case; two header variables switch
 it to the post-drainage free-slip-patch case:
 
 ```bash
-cd elmer-ice/real_topography/viscous/lake2394
+cd solverfiles/real_topography/viscous/lake2394
 docker run --rm -v "$PWD":/work -w /work andrewdnolan/elmerice \
   bash -lc "elmerf90 PROG/USF_TAVz.F90 -o PROG/USF_TAVz && \
             ElmerGrid 14 2 lake2394_d25km_r2500m.msh -autoclean && \
@@ -138,9 +138,9 @@ from the production run logs on a Google Cloud `n1-highmem-64` instance.
 
 | Category | Mesh size | Wall time per solve | Memory |
 |---|---|---|---|
-| Real topography, viscous | ~46.8k-node footprint × 20 levels (~0.9 M nodes) | ~6–25 h | large — see note |
-| Real topography, elastic | same mesh | ~12–16 h | large — see note |
-| Idealized slab | ~1k-node footprint × 30 levels | minutes to ~1.7 h | laptop-friendly |
+| Real topography, viscous | ~56.8k-node footprint × 10 levels (~0.57 M nodes) | ~6–25 h | large — see note |
+| Real topography, elastic | ~46.8k-node footprint × 20 levels (~0.94 M nodes) | ~12–16 h | large — see note |
+| Idealized slab | ~62k-node footprint × 12 levels (~0.75 M nodes) | minutes to ~1.7 h | workstation-friendly |
 
 **Memory note:** the production runs were limited to 4 simultaneous solves on
 a 416 GB instance by memory; budget on the order of 100 GB RAM per

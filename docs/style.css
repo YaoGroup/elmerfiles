@@ -48,7 +48,7 @@ a { color: var(--gold-bright); }
   display: grid;
   grid-template-columns: max-content 230px auto;
   align-items: center;
-  column-gap: 0.7rem;
+  column-gap: 1rem;
 }
 .sv-sym {
   font-family: 'EB Garamond', Georgia, serif;
@@ -59,10 +59,12 @@ a { color: var(--gold-bright); }
   text-align: right;
   grid-row: 1;
 }
+.sv-sym sub { font-size: 0.6em; }
 .sv-val {
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  min-width: 4rem;   /* widest value ("2.5 km"); keeps the row from shifting */
   grid-row: 1;
 }
 .sv-track { position: relative; grid-row: 1; }

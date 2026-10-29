@@ -9,7 +9,7 @@ const DATA = 'data/';
 const PARAMS = [
   { key: 'H', sym: 'H', unit: 'km', fmt: (v) => num(v / 1000) },
   { key: 'alpha_deg', sym: 'α', unit: '°', fmt: (v) => num(v) },
-  { key: 'c0H_eta', sym: 'c₀H/η', unit: '', fmt: (v) => String(v) },
+  { key: 'c0H_eta', sym: 'c0H/η', symHtml: '<i>c</i><sub>0</sub><i>H</i>/<i>η</i>', unit: '', fmt: (v) => String(v) },
   { key: 'R', sym: 'R', unit: 'km', fmt: (v) => num(v / 1000) },
 ];
 const FIELD_HTML = {
@@ -59,7 +59,9 @@ function build() {
   for (const p of PARAMS) {
     const stops = MAN.params[p.key];
     const sl = el('div', 'sv-sl');
-    sl.appendChild(el('span', 'sv-sym', p.sym));
+    const sym = el('span', 'sv-sym');
+    sym.innerHTML = p.symHtml || p.sym;
+    sl.appendChild(sym);
     const track = el('div', 'sv-track');
     const input = document.createElement('input');
     input.type = 'range';
