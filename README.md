@@ -1,10 +1,10 @@
-# pnas2026-solverfiles
+# elmerfiles
 
 Elmer/Ice solver input files for:
 
 > Lai, C.-Y., Rines, J. H., Coffey, N. B., Lee, E., Clerc, F., Hilditch, J. P.,
 > Gagliardini, O., & Stevens, L. A. (2026). *From blistering to sliding:
-> Ice-sheet stress perturbations from water injection to the bed.* PNAS.
+> Ice-sheet stress perturbations from water injection to the bed.*
 
 These are the solver input files (`.sif`) used for the full-Stokes
 Elmer/Ice simulations in the paper: viscous (free-slip slippery patch) and
@@ -60,9 +60,9 @@ viscous stress space evolving alongside (gold rings: lake 2394's tile).*
   undisturbed reference.
 - **Idealized** — Newtonian flat slabs with a circular free-slip patch,
   validating the paper's analytical solution (Fig. 3).
-  **[Explore these simulations interactively](https://yaogroup.github.io/pnas2026-solverfiles/)**
-  — sweep $H$, $\alpha$, $\gamma$, $R$ and compare simulation, theory, and
-  difference for every stress component.
+  **[Explore the analytical solution interactively](https://yaogroup.github.io/elmerfiles/)**
+  — sweep $H$, $\alpha$, $c_0H/\eta$, $R$ and see every stress component of
+  the paper's stress-perturbation solution (Eq. 2).
 
 ## Running the simulations
 
@@ -79,8 +79,8 @@ patch $R$ = 2500 m — one of the simulations in Fig. 3D. Runs in well under an 
 on an ordinary laptop:
 
 ```bash
-git clone https://github.com/YaoGroup/pnas2026-solverfiles.git
-cd pnas2026-solverfiles/elmer-ice/idealized_slab
+git clone https://github.com/YaoGroup/elmerfiles.git
+cd elmerfiles/elmer-ice/idealized_slab
 docker pull andrewdnolan/elmerice
 
 # 1) convert the gmsh mesh to an Elmer mesh database (creates flatslabnewt_R2500/)
